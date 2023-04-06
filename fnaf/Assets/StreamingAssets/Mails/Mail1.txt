@@ -1,0 +1,16 @@
+
+Hello.
+
+Welcome in your new summer job! I'm so happy you accepted our offer!
+
+First, I'll tell you something about our company. So, we're running a small laboratory. We're working on unusual creatures and mutants to order. As you probably guessed not everything what we're doing here is legal (better for you if you don't report anything to anybody).
+
+Your task is to keep order at night in our laboratory for 5 next nights. It's very easy! To check what's going on in the building check cameras (click this button on monitor). If you notice that something isn't okay, don't worry, it may be one of the "residents" of our laboratory. They like to walk around the building during night. At 6 am your shift ends and someone should come to relieve you so that you can go home.
+
+But be careful. If you see someone nearby, be sure to close the door.
+And the last thing, energy. Just try to save it. When it runs out, you won't be able to check cameras, use light and close doors...
+
+But don't worry. Just be careful, conserve energy and nothing should happen to you.
+
+See you in the morning.
+Your Boss.
