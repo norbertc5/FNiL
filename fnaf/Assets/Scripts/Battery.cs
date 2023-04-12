@@ -60,7 +60,7 @@ public class Battery : MonoBehaviour
 
         int power = powerUsage;
 
-        // power usage can'timeToChangeState be too big
+        // power usage can't be too big
         if (powerUsage > 4)
             power = 4;
 
