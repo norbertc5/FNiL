@@ -1,0 +1,5 @@
+After finishing the 5th night, you unlock extra features such as a special 6th night, the possibility to play all nights in any order, and a developer console.
+
+The console allows you to modify gameplay, as it was used in the testing process of the game. To turn the console on and off, press F1 on your keyboard. Have fun!
+
+Here are all the possible commands to type in the developer console.

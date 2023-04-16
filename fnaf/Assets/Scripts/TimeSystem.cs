@@ -5,7 +5,8 @@ using TMPro;
 
 public class TimeSystem : MonoBehaviour
 {
-    public float secondsToMinute;
+    [SerializeField] float secondsToMinute;  // how long time must pass to change seconds variable
+    public float timeSpeed = 1;
     [SerializeField] TextMeshPro timeDisplayText;
 
     public static int hour = 12;
@@ -21,15 +22,17 @@ public class TimeSystem : MonoBehaviour
 
     void Update()
     {
-        seconds += Time.deltaTime;
+        seconds += Time.deltaTime * timeSpeed;
 
-        if(seconds > secondsToMinute)
+        // when seconds variable is bigger than secondsToMinute, minutes variable increases
+        if (seconds > secondsToMinute)
         {
             minutes++;
             UpdateText();
             seconds = 0;
         }
 
+        // increase hour variable
         if(minutes >= 59)
         {
             hour++;

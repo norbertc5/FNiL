@@ -116,6 +116,25 @@ public class GameManager : MonoBehaviour
         OnJumpscare += GameOver;
         OnNightEnd += Win;
         OnPowerRunOut += PowerRunOut;
+
+        #region Enables encyclopedia entries
+
+        if (actualNightIndex == 1)
+        {
+            PlayerPrefs.SetString("Der Kiefergezahnt", "true");
+            PlayerPrefs.SetString("Skin-Man", "true");
+            PlayerPrefs.SetString("You", "true");
+            PlayerPrefs.SetString("The Boss", "true");
+            PlayerPrefs.SetString("The Laboratory", "true");
+            PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
+        }
+        else if(actualNightIndex == 2)
+        {
+            PlayerPrefs.SetString("Ghoul", "true");
+            PlayerPrefs.SetString("Clawler", "true");
+            PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
+        }
+        #endregion
     }
 
     IEnumerator LateStart()
@@ -170,18 +189,6 @@ public class GameManager : MonoBehaviour
 
         ButtonsInSecurityRoomActiveChange(false);
 
-        /*// turn off lights sounds
-        foreach (LightCorridorButton b in lightButtons)
-        {
-            b.GetComponent<AudioSource>().enabled = false;
-        }
-
-        // turn off doors sound (beeping)
-        foreach (DoorButton b in doorButtons)
-        {
-            b.GetComponent<AudioSource>().enabled = false;
-        }*/
-
         // turn off all enemies
         foreach (var enemy in enemies)
         {
@@ -211,6 +218,13 @@ public class GameManager : MonoBehaviour
         foreach (var enemy in enemies)
         {
             enemy.gameObject.SetActive(false);
+        }
+
+        if(actualNightIndex == 5)
+        {
+            PlayerPrefs.SetString("HasFinished5thNight", "true");
+            PlayerPrefs.SetString("Console", "true");
+            PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
         }
     }
 

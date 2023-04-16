@@ -150,7 +150,7 @@ public class EnemiesBehaviour : MonoBehaviour
         if(doorScript.isOn)
         {
             // there is 1 in 3 chance that enemy who can open door, do this
-            if (Random.Range(1, 4) == 1 && canOpenSecurityDoor)
+            if (Random.Range(1, 5) == 1 && canOpenSecurityDoor)
             {
                 doorScript.UseDoor(0.1f, true, false);
                 doorScript.OnEnemyUse();

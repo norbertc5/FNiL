@@ -12,7 +12,6 @@ public class MailSystem : MonoBehaviour
 {
     public GameObject paperProp;
 
-    //[SerializeField] GameObject mailButtonObject;
     [SerializeField] GameObject mailUI;
     [SerializeField] Animator paperAnim;
     [SerializeField] AudioClip paperSound;
@@ -21,7 +20,6 @@ public class MailSystem : MonoBehaviour
     DepthOfField depthOfField;
     GameManager gameManager;
     float blurFadeSpeed = 150;
-    //bool hasMailOpened;
 
     IEnumerator Start()
     {

@@ -50,7 +50,7 @@ public class Console : CommandBehaviour
     {
         Debug.Log("Time speed was set to " + newSpeed + " (default is 1).");
         TimeSystem timeSystem = FindObjectOfType<TimeSystem>();
-        timeSystem.secondsToMinute = newSpeed;
+        timeSystem.timeSpeed = newSpeed;
     }
 
     [Command]
