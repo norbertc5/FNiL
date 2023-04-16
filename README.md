@@ -1,2 +1,2 @@
 # FNiL
-Five Nights in Laboratory. FNaF fun game.
+Five Nights in Laboratory. FNaF fan game.
