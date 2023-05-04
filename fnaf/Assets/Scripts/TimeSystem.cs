@@ -42,8 +42,11 @@ public class TimeSystem : MonoBehaviour
 
             UpdateText();
 
-            if (hour == 6)
-                GameManager.OnNightEnd?.Invoke();
+            if (hour >= 6)
+            {
+                GameManager g = FindObjectOfType<GameManager>();
+                g.OnNightEnd?.Invoke();
+            }
 
             GameManager.OnHourChanges?.Invoke();
 

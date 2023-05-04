@@ -7,9 +7,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.IO;
 using System.Linq;
+using URPGlitch.Runtime.DigitalGlitch;
+using UnityEngine.Rendering;
 
 public class MenuManager : MonoBehaviour
 {
+    int nightIndex = 1;
+
     [Header("Random events")]
     [Space(6)]
 
@@ -21,30 +25,60 @@ public class MenuManager : MonoBehaviour
     [Header("Encyclopedia")]
     [Space(6)]
 
-    [SerializeField] GameObject encyclopediaObject;
     public TextMeshProUGUI textInEncyclopedia;
     public Image imageInEncyclopedia;
     public float encyclopediaTextYPos;
     public const float DEFAULT_TEXT_SIZE_IN_ENCYCLOPEDIA_TAB_BUTTON = 40;
     [SerializeField] GameObject exclamationMarkObject;
 
+    [Space(10)]
+    [Header("Tabs")]
+    [Space(6)]
+
+    [SerializeField] GameObject encyclopediaTab;
+    [SerializeField] GameObject optionsTab;
+    [SerializeField] GameObject creditsTab;
+    [SerializeField] GameObject endGameInfoObject;
+
+    [Space(10)]
+    [Header("UI")]
+    [Space(6)]
+
     [SerializeField] TextMeshProUGUI playButtonText;
-    int nightIndex = 1;
+    [SerializeField] GameObject buttonsHolder;
+    [SerializeField] GameObject arrowButtonsHolder;
+
+    [Space(10)]
+    [Header("PostProcessing")]
+    [Space(6)]
+
+    [SerializeField] VolumeProfile securityCamerasProfile;
+    DigitalGlitchVolume digitalGlitchIntensity;
 
     void Start()
     {
         StartCoroutine(MakeEvent());
         encyclopediaTextYPos = textInEncyclopedia.rectTransform.position.y;
-
-        Debug.Log(PlayerPrefs.GetString("HasRevaledForNight" + nightIndex) != "true");
+        securityCamerasProfile.TryGet(out digitalGlitchIntensity);
+        digitalGlitchIntensity.intensity.value = 0.009f;
+        SetNightToPlay(PlayerPrefs.GetInt("NextNightIndex", 1));
 
         // exclamation mark appears only if player starts night once. If player starts same night 2nd time, exclamation mark won't appear
-        if((PlayerPrefs.GetString("IsSthNewInEncyclopedia") == "true" || PlayerPrefs.GetString("HasFinished5thNight") == "true") 
+        if ((PlayerPrefs.GetString("IsSthNewInEncyclopedia") == "true") 
             && PlayerPrefs.GetString("HasRevaledForNight" + nightIndex) != "true")
         {
             exclamationMarkObject.SetActive(true);
-            PlayerPrefs.SetString("HasRevaledForNight" + nightIndex, "true");
+
+            if(PlayerPrefs.GetString("HasFinished5thNight") == "true" && PlayerPrefs.GetString("HasRevaledForNight" + nightIndex) != "true")
+            {
+                endGameInfoObject.SetActive(true);
+                buttonsHolder.SetActive(false);
+            }
         }
+
+        // arrow buttons turn on when 5th night is finiished
+        if(PlayerPrefs.GetString("HasFinished5thNight") == "true")
+            arrowButtonsHolder.SetActive(true);
     }
 
 
@@ -91,13 +125,22 @@ public class MenuManager : MonoBehaviour
     public void PlayButton()
     {
         PlayerPrefs.SetInt("nightIndex", nightIndex);
+        PlayerPrefs.Save();
         SceneManager.LoadScene(1);
     }
 
     public void EncyclopediaButon()
     {
-        encyclopediaObject.SetActive(true);
+        encyclopediaTab.SetActive(true);
+
+        if(PlayerPrefs.GetString("IsSthNewInEncyclopedia") == "true")
+            PlayerPrefs.SetString("HasRevaledForNight" + nightIndex, "true");
+
+        if (nightIndex == 6)
+            PlayerPrefs.SetString("HasRevaledCongratulations", "true");
+
         PlayerPrefs.SetString("IsSthNewInEncyclopedia", "false");
+        PlayerPrefs.Save();
         exclamationMarkObject.SetActive(false);
     }
 
@@ -105,6 +148,12 @@ public class MenuManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void OpenTab(GameObject tab)
+    {
+        tab.SetActive(true);
+    }
+
 
     public void ChangeNightToPlay(int changeBy)
     {
@@ -117,9 +166,24 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    void SetNightToPlay(int night)
+    {
+        nightIndex = night;
+        playButtonText.text = "Night " + nightIndex;
+    }
+
     public void CloseAllTabs()
     {
         // close all tabs in menu
-        encyclopediaObject.SetActive(false);
+        encyclopediaTab.SetActive(false);
+        optionsTab.SetActive(false);
+        creditsTab.SetActive(false);
+        endGameInfoObject.SetActive(false);
+        buttonsHolder.SetActive(true);
+    }
+
+    public void OpenURL(string url)
+    {
+        Application.OpenURL(url);
     }
 }

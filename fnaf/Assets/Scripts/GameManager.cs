@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     public static Action OnEnemyPositionChanged;
     public static Action OnHourChanges;
     public static Action OnJumpscare;
-    public static Action OnNightEnd;
+    public Action OnNightEnd;
     public static Action OnPowerRunOut;
     public static Action OnConfigSet;
 
@@ -81,6 +81,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject mailButtonObject;
     [SerializeField] TextMeshProUGUI nightText;
     [SerializeField] GameObject pauseScreen;
+    [SerializeField] GameObject optionsTab;
+    [SerializeField] GameObject buttonsHolder;
 
     [Space(10)]
     [Header("Thingh needed when\nbattery gone out")]
@@ -100,6 +102,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(LateStart());
+        actualNightIndex = PlayerPrefs.GetInt("nightIndex");
+        TimeSystem.hour = 12;
+        Battery.batteryState = 100;
+        isGamePaused = false;
+
+        #region Objects assignment
+
         postProcessingVolume = postProcessingVolumeHelper;
         securityCamerasProfile = securityCamerasProfileHelper;
         standardProfile = standardProfileHelper;
@@ -108,14 +118,16 @@ public class GameManager : MonoBehaviour
         enemies = enemiesHelper;
         clickSound = clickSoundHelper;
         camerasController = FindObjectOfType<CamerasController>();
-        StartCoroutine(LateStart());
 
-        actualNightIndex = PlayerPrefs.GetInt("nightIndex");
-        nightText.text = "Night " + actualNightIndex;
+        #endregion
+
+        #region Events subscription
 
         OnJumpscare += GameOver;
         OnNightEnd += Win;
         OnPowerRunOut += PowerRunOut;
+
+        #endregion
 
         #region Enables encyclopedia entries
 
@@ -127,13 +139,22 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetString("The Boss", "true");
             PlayerPrefs.SetString("The Laboratory", "true");
             PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
+            PlayerPrefs.Save();
         }
         else if(actualNightIndex == 2)
         {
             PlayerPrefs.SetString("Ghoul", "true");
             PlayerPrefs.SetString("Clawler", "true");
             PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
+            PlayerPrefs.Save();
         }
+
+        #endregion
+
+        #region UI set
+
+        nightText.text = "Night " + actualNightIndex;
+
         #endregion
     }
 
@@ -148,29 +169,7 @@ public class GameManager : MonoBehaviour
         // when esc pressed, time stops and pause screen appears, pause can't be enable when game over
         if(Input.GetKeyDown(KeyCode.Escape) && !isGameOver)
         {
-            isGamePaused = !isGamePaused;
-            pauseScreen.SetActive(isGamePaused);
-            ambientSoundsHolder.SetActive(!isGamePaused);
-            ButtonsInSecurityRoomActiveChange(!isGamePaused);
-
-            #region Audio mute
-            areSecurityRoomButtonsActive = !isGamePaused;
-            LightCorridorButton[] lightButtons = FindObjectsOfType<LightCorridorButton>();
-
-            foreach(LightCorridorButton button in lightButtons)
-            {
-                if (isGamePaused)
-                    button.GetComponent<AudioSource>().volume = 0;
-                else
-                    button.GetComponent<AudioSource>().volume = 0.05f;
-            }
-            #endregion
-
-            // stop or resume time
-            if (isGamePaused)
-                Time.timeScale = 0;
-            else
-                Time.timeScale = 1;
+            Pause();
         }
     }
 
@@ -183,11 +182,8 @@ public class GameManager : MonoBehaviour
         secCamerasMonitor.SetActive(false);
         camerasController.gameObject.SetActive(false);
         StartCoroutine(SwitchSceneToMenu());
-
-        LightCorridorButton[] lightButtons = FindObjectsOfType<LightCorridorButton>();
-        DoorButton[] doorButtons = FindObjectsOfType<DoorButton>();
-
         ButtonsInSecurityRoomActiveChange(false);
+        PlayerPrefs.SetInt("NextNightIndex", actualNightIndex);
 
         // turn off all enemies
         foreach (var enemy in enemies)
@@ -204,7 +200,7 @@ public class GameManager : MonoBehaviour
 
     void Win()
     {
-        GetComponent<TimeSystem>().enabled = false;
+        this.gameObject.GetComponent<TimeSystem>().enabled = false;
         ambientSoundsHolder.SetActive(false);
         camerasController.CloseSecurityCameras();
         secCamerasMonitor.SetActive(false);
@@ -220,12 +216,43 @@ public class GameManager : MonoBehaviour
             enemy.gameObject.SetActive(false);
         }
 
-        if(actualNightIndex == 5)
+        // when player wins 5th, special things unlock
+        if (actualNightIndex == 5/* && PlayerPrefs.GetString("HasRevaledForNight" + actualNightIndex) != "true"*/)
         {
             PlayerPrefs.SetString("HasFinished5thNight", "true");
             PlayerPrefs.SetString("Console", "true");
             PlayerPrefs.SetString("IsSthNewInEncyclopedia", "true");
+            PlayerPrefs.Save();
         }
+
+        #region Set UI
+
+        buttonsHolder.SetActive(true);
+        buttonsHolder.transform.Find("Resume").gameObject.SetActive(false);
+
+        // turning on or off next night button
+        if (actualNightIndex == 6)
+            buttonsHolder.transform.Find("NextNight").gameObject.SetActive(false);
+        else
+            buttonsHolder.transform.Find("NextNight").gameObject.SetActive(true);
+
+        // when there is something new in encyclopedia, text on win screen will appear
+        if ((actualNightIndex != 5 && PlayerPrefs.GetString("IsSthNewInEncyclopedia") == "true" && 
+           PlayerPrefs.GetString("HasRevaledForNight" + actualNightIndex) != "true") 
+           || (actualNightIndex == 5 && PlayerPrefs.GetString("HasRevaledCongratulations") != "true"))
+            winUI.transform.Find("NewEntryText").gameObject.SetActive(true);
+        else
+            winUI.transform.Find("NewEntryText").gameObject.SetActive(false);
+
+        #endregion
+
+        // when player click play button in menu, correct night will start
+        if(actualNightIndex != 6)
+            PlayerPrefs.SetInt("NextNightIndex", actualNightIndex += 1);
+        else
+            PlayerPrefs.SetInt("NextNightIndex", actualNightIndex);
+
+        PlayerPrefs.Save();
     }
 
     void PowerRunOut()
@@ -395,5 +422,57 @@ public class GameManager : MonoBehaviour
         {
             doorButton.GetComponent<MeshCollider>().enabled = newActiveState;
         }
+    }
+
+    public void OpenOrCloseOptions()
+    {
+        Options options = FindObjectOfType<Options>();
+        optionsTab.SetActive(!optionsTab.activeSelf);
+    }
+
+    public void LoadScene(int index)
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(index);
+    }
+
+    public void NextNight()
+    {
+        PlayerPrefs.SetInt("nightIndex", PlayerPrefs.GetInt("nightIndex") + 1);
+        PlayerPrefs.Save();
+        SceneManager.LoadScene(1);
+    }
+
+    public void Resume()
+    {
+        Pause();
+    }
+
+    void Pause()
+    {
+        isGamePaused = !isGamePaused;
+        pauseScreen.SetActive(isGamePaused);
+        ambientSoundsHolder.SetActive(!isGamePaused);
+        ButtonsInSecurityRoomActiveChange(!isGamePaused);
+        buttonsHolder.SetActive(isGamePaused);
+        buttonsHolder.transform.Find("NextNight").gameObject.SetActive(false);
+
+        if(optionsTab.activeSelf)
+            optionsTab.SetActive(isGamePaused);
+
+        #region Audio mute
+
+        if (isGamePaused)
+            AudioListener.volume = 0;
+        else
+            AudioListener.volume = PlayerPrefs.GetFloat("Volume", 1);
+
+        #endregion
+
+        // stop or resume time
+        if (isGamePaused)
+            Time.timeScale = 0;
+        else
+            Time.timeScale = 1;
     }
 }

@@ -2,4 +2,28 @@ After finishing the 5th night, you unlock extra features such as a special 6th n
 
 The console allows you to modify gameplay, as it was used in the testing process of the game. To turn the console on and off, press F1 on your keyboard. Have fun!
 
-Here are all the possible commands to type in the developer console.
+Here are all the possible commands to type in the developer console:
+
+-Help - shows all commands,
+
+-MoveEnemyToDoor (enemyIndex) - makes enemy will be in front of security room door in his next step (enemyIndex from 0 to 2),
+
+-ResetEnemyPosition (enemyIndex) - makes enemy will be on his start position in next step,
+
+-SetHourTo (hour),
+
+-SetBatteryStateTo (newBatteryState),
+
+-SetTimeSpeed (newSpeed),
+
+-StartCrawler - make clawler turns on and starts,
+
+-SetNightIndex (night) - make game thinks that it's other night,
+
+-ShowMailProp - paper with mail will show on desk,
+
+-DayLighting - lighting like at day,
+
+-NightLighting - lighting like at night.
+
+To autocomplete press Tab. The commands hasn't any safe system, so it may cause some errors.

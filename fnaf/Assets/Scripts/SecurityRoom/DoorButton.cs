@@ -111,7 +111,7 @@ public class DoorButton : MonoBehaviour
     public void OnEnemyUse()
     {
         // when enemy opens door
-        // it isn'timeToChangeState invokes directly, because returns error: Coroutine continue failure
+        // it isn't invokes directly, because returns error: Coroutine continue failure
         coroutine = StartCoroutine(ButtonBacklightBlink());
     }
 }

@@ -116,7 +116,7 @@ namespace SmartConsole.Components
 #if ENABLE_LEGACY_INPUT_MANAGER && !ENABLE_INPUT_SYSTEM
         private void Update()
         {
-            if (Input.GetKeyDown(m_OpenCloseKeyCode))
+            if (Input.GetKeyDown(m_OpenCloseKeyCode) && PlayerPrefs.GetString("HasFinished5thNight") == "true")
             {
                 OpenCloseConsole();
             }

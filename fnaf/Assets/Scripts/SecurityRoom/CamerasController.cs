@@ -34,8 +34,6 @@ public class CamerasController : MonoBehaviour
     [SerializeField] AudioClip camerasOpenSound;
     [SerializeField] AudioClip camerasGlitchSound;
     [SerializeField] AudioClip changeSecurityCamSound;
-    //[SerializeField] AudioMixerSnapshot defaultAmbient;
-    //[SerializeField] AudioMixerSnapshot muffedAmbient;
     AudioSource source;
 
     public static bool areSecurityCamerasOpen;
@@ -295,8 +293,8 @@ public class CamerasController : MonoBehaviour
         if(areSecurityCamerasOpen)
         {
             GameManager.soundsSource.PlayOneShot(camerasGlitchSound);
-            coroutine = StartCoroutine(StopGlitchSoundIfSecurityCamsClosed());
         }
+        coroutine = StartCoroutine(StopGlitchSoundIfSecurityCamsClosed());
 
         yield return new WaitForSeconds(Random.Range(0.3f, 1.4f));
 
@@ -304,10 +302,7 @@ public class CamerasController : MonoBehaviour
         {
             item.transform.GetChild(0).gameObject.SetActive(true);
         }
-
-        if(areSecurityCamerasOpen)
-            StopCoroutine(coroutine);
-
+        StopCoroutine(coroutine);        
         areSecurityCamsGlitched = false;
     }
 

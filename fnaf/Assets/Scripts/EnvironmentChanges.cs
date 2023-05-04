@@ -5,9 +5,16 @@ using UnityEngine;
 public class EnvironmentChanges : MonoBehaviour
 {
     enum ActionType {ChangeRotation, PlayAnimation, ChangeObject, OnlySound};
-    [SerializeField] ActionType thisObjectAction;
-    [SerializeField] bool waitRandomTime;
 
+    [Header("General")]
+    [Space(6)]
+
+    [SerializeField] ActionType thisObjectAction;
+    [SerializeField] int nightToPlayAt = 1;  // only works if waitRandomTime is true, if ApplyAction is invoked by other script, it doesn't matter
+    [SerializeField] bool waitRandomTime;
+    [SerializeField] bool playOnlyOneTimeInGame;  // if true, sound will play one time in whole game
+
+    [Space(10)]
     [Header("Rotation change")]
     [Space(6)]
     [SerializeField] Vector3 newRotation;
@@ -30,23 +37,24 @@ public class EnvironmentChanges : MonoBehaviour
     [Space(6)]
     [SerializeField] AudioSource source;
     [SerializeField] AudioClip clip;
-    [SerializeField] bool playOnlyOneTimeInGame;  // if true, sound will play one time in whole game
-    [SerializeField] bool canBePlayedAtFirstNight;
 
-    private void Start()
+    private IEnumerator Start()
     {
-        if (waitRandomTime)
+        // it's coroutine due to GameManager manage to set actualNightIndex variable (it's also it Start)
+        yield return new WaitForSeconds(1);
+        if (waitRandomTime && GameManager.actualNightIndex == nightToPlayAt)
             StartCoroutine(Wait());
     }
 
     IEnumerator Wait()
     {
-        yield return new WaitForSeconds(Random.Range(5, 10));
+        yield return new WaitForSeconds(Random.Range(35, 300));
         ApplyAction();
     }
 
     public void ApplyAction()
     {
+        // if playOnlyOneTimeInGame true, action will be apply only once, even when manually invoked in other script
         if (!playOnlyOneTimeInGame || (playOnlyOneTimeInGame && PlayerPrefs.GetString("HasChangeMade " + this.name) != "yes"))
         {
             switch (thisObjectAction)
@@ -60,8 +68,7 @@ public class EnvironmentChanges : MonoBehaviour
             if (source != null && clip != null)
                 source.PlayOneShot(clip);
 
-            //Debug.Log(this.name + PlayerPrefs.GetString("HasChangeMade " + this.name));
-
+            // action can be made only once in game
             if (playOnlyOneTimeInGame)
             {
                 PlayerPrefs.SetString("HasChangeMade " + this.name, "yes");

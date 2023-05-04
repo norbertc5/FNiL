@@ -195,8 +195,15 @@ public class EnemiesBehaviour : MonoBehaviour
     void StartWalking()
     {
         // start walkin on appointed hour
-        if (TimeSystem.hour == startHour && this.gameObject.activeSelf)
-            StartCoroutine(ChangePosition());
+        // try-catch make it doesn't drop errors after go to menu and next back to game
+        try
+        {
+            if (TimeSystem.hour == startHour && this.gameObject.activeSelf)
+                StartCoroutine(ChangePosition());
+        }
+        catch
+        {
+        }
     }
 
     void ChangePosDelayBorders(float changeBy)

@@ -67,9 +67,7 @@ public class LightCorridorButton : MonoBehaviour
     {
         while(true)
         {
-            if(!GameManager.isGamePaused)
-                source.Play();
-
+            source.Play();
             yield return new WaitForSecondsRealtime(source.clip.length);
         }
     }
